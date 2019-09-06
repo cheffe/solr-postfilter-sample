@@ -23,10 +23,10 @@
  */
 package com.github.cheffe.solr.postfilter;
 
-import com.google.common.truth.Truth;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.SolrPingResponse;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +35,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.truth.Truth.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class PostFilterPerformanceTest {
@@ -45,21 +49,55 @@ class PostFilterPerformanceTest {
   }
 
   @BeforeAll
-  void startSolrServer() {
-    this.container = new CoreContainer("src/test/resources/solrHome");
-    this.container.load();
-    this.server = new EmbeddedSolrServer(this.container, "postfilter");
+  void startSolrServer() throws IOException, SolrServerException {
+    container = new CoreContainer("src/test/resources/solrHome");
+    container.load();
+    server = new EmbeddedSolrServer(container, "postfilter");
+
+    createSampleData();
+  }
+
+  private void createSampleData() throws IOException, SolrServerException {
+    int batchSize = 100000;
+    List<SolrInputDocument> batch = new ArrayList<>(batchSize);
+    for (int id = 1; id < 180001; id++) {
+      SolrInputDocument doc = new SolrInputDocument();
+      doc.setField("id", id);
+
+      List<Integer> ints = new ArrayList<>(10);
+      List<String> strings = new ArrayList<>(10);
+      for(int i = 0; i < 10; i++) {
+        ints.add(id % 100);
+        strings.add("string-" + id % 100);
+      }
+      doc.setField("ints", ints);
+      doc.setField("strings", strings);
+
+      String customid = id % 200000 + "_" +  String.format ("%03d",1 + id / 200000);
+      doc.setField("customid", customid);
+
+      batch.add(doc);
+      if (batch.size() == batchSize) {
+        server.add(batch);
+        batch.clear();
+      }
+
+    }
+    if (batch.size() > 0) {
+      server.add(batch);
+    }
+    server.commit(true, true);
   }
 
   @AfterAll
   void stopSolrServer() throws IOException {
-    this.server.close();
-    this.container.shutdown();
+    server.close();
+    container.shutdown();
   }
 
   @Test
   void ping() throws IOException, SolrServerException {
-    SolrPingResponse response = this.server.ping();
-    Truth.assertThat(response.toString()).contains("status=OK");
+    SolrPingResponse response = server.ping();
+    assertThat(response.toString()).contains("status=OK");
   }
 }

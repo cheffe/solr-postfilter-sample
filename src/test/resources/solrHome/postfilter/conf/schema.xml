@@ -26,9 +26,10 @@
 <schema name="postfilter" version="1.5">
 
   <fields>
-    <field name="id"      type="string" indexed="true" stored="true" multiValued="false" />
-    <field name="ints"    type="int"    indexed="true" stored="true" multiValued="true" />
-    <field name="strings" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="id"       type="string" indexed="true" stored="true" multiValued="false" />
+    <field name="ints"     type="int"    indexed="true" stored="true" multiValued="true" />
+    <field name="strings"  type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="customid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   </fields>
 
   <uniqueKey>id</uniqueKey>
