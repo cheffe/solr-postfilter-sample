@@ -24,8 +24,9 @@
   -->
 <Configuration status="WARN" monitorInterval="0">
   <Properties>
-    <Property name="LOG_PATTERN">%d{ISO8601_OFFSET_DATE_TIME_HH}
-      %p %m%n</Property>
+    <Property name="LOG_PATTERN">
+      %date{ISO8601_OFFSET_DATE_TIME_HH} %-5level [%class] %message%n%throwable
+    </Property>
   </Properties>
 
   <Appenders>
@@ -36,6 +37,12 @@
 
   <Loggers>
     <Logger name="org.apache.solr" additivity="false">
+      <AppenderRef ref="Console" />
+    </Logger>
+    <Logger name="org.apache.solr.metrics" level="warn" additivity="false">
+      <AppenderRef ref="Console" />
+    </Logger>
+    <Logger name="org.eclipse.jetty.util.ssl" level="error" additivity="false">
       <AppenderRef ref="Console" />
     </Logger>
 
