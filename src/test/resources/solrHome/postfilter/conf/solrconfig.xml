@@ -32,11 +32,12 @@
   <luceneMatchVersion>8.2.0</luceneMatchVersion>
 
   <updateHandler class="solr.DirectUpdateHandler2">
-    <commitWithin>
-      <softCommit>true</softCommit>
-    </commitWithin>
-
+    <!-- reduce auto-commit -->
+    <autoCommit>
+      <maxDocs>-1</maxDocs>
+    </autoCommit>
   </updateHandler>
+
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
       <str name="echoParams">explicit</str>
