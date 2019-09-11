@@ -1,2 +1,2 @@
 # solr-postfilter-sample
-Examples of PostFilter implementations for Apache Solr.
+Trying to reproduce the performance described on StackOverflow [SOLR 7+ / Lucene 7+ and performance issues with DelegatingCollector and PostFilter](https://stackoverflow.com/q/57663857/2160152).
