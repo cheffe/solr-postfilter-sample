@@ -23,30 +23,30 @@
  */
 package com.github.cheffe.solr.postfilter;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.apache.solr.client.solrj.response.SolrPingResponse;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.lang.String.format;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class PostFilterPerformanceTest {
   private CoreContainer container;
   private EmbeddedSolrServer server;
-
-  PostFilterPerformanceTest() {
-  }
 
   @BeforeAll
   void startSolrServer() throws IOException, SolrServerException {
@@ -73,7 +73,7 @@ class PostFilterPerformanceTest {
       doc.setField("ints", ints);
       doc.setField("strings", strings);
 
-      String customid = id % 200000 + "_" +  String.format ("%03d",1 + id / 200000);
+      String customid = id % 200000 + "_" +  format ("%03d", 1 + id / 200000);
       doc.setField("customid", customid);
 
       batch.add(doc);
@@ -95,9 +95,13 @@ class PostFilterPerformanceTest {
     container.shutdown();
   }
 
-  @Test
-  void ping() throws IOException, SolrServerException {
-    SolrPingResponse response = server.ping();
-    assertThat(response.toString()).contains("status=OK");
+  @ParameterizedTest
+  @ValueSource(ints = {50, 500, 1000, 1500, 2000, 2500, 5000})
+  void benchmark(int count) throws IOException, SolrServerException {
+    SolrQuery query  = new SolrQuery("*:*");
+    query.addFilterQuery(format("{!idFilter count=%d}", count));
+    QueryResponse response = server.query(query);
+    System.out.format("count=%d - QTime=%d", count, response.getQTime());
+    assertThat(response.getResults().getNumFound()).isEqualTo(count);
   }
 }

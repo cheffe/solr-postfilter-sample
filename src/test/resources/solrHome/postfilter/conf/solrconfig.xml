@@ -44,6 +44,8 @@
       <str name="indent">true</str>
       <str name="df">text</str>
     </lst>
-
   </requestHandler>
+
+  <queryParser name="idFilter" class="com.github.cheffe.solr.postfilter.IdFilterQParserPlugin"/>
+
 </config>
