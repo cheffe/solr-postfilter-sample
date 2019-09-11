@@ -60,7 +60,7 @@ class PostFilterPerformanceTest {
   private void createSampleData() throws IOException, SolrServerException {
     int batchSize = 100000;
     List<SolrInputDocument> batch = new ArrayList<>(batchSize);
-    for (int id = 1; id < 180001; id++) {
+    for (int id = 1; id < 1800001; id++) {
       SolrInputDocument doc = new SolrInputDocument();
       doc.setField("id", id);
 
@@ -102,6 +102,7 @@ class PostFilterPerformanceTest {
     query.addFilterQuery(format("{!idFilter count=%d}", count));
     QueryResponse response = server.query(query);
     System.out.format("count=%d - QTime=%d", count, response.getQTime());
-    assertThat(response.getResults().getNumFound()).isEqualTo(count);
+    assertThat(response.getResults().getNumFound()).isEqualTo(count - 1);
   }
+
 }
