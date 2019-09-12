@@ -9,3 +9,4 @@ This table includes the runtime in _ms_ per notable change.
 |---|---|---|---|---|---|---|---|
 | initial | 315 | 292 | 294 | 301 | 292 | 299 | 306 |
 | store reader | 298 | 295 | 302 | 313 | 303 | 304 | 307 |
+| increase maxBooleanClauses, use filter | 3 | 7 | 10 | 16 | 20 | 20 | 32 |

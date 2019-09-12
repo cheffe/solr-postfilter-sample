@@ -101,7 +101,7 @@ class PostFilterPerformanceTest {
 
   @ParameterizedTest
   @ValueSource(ints = {50, 500, 1000, 1500, 2000, 2500, 5000})
-  void benchmark(int count) throws IOException, SolrServerException {
+  void postFilter(int count) throws IOException, SolrServerException {
     SolrQuery query  = new SolrQuery("*:*");
     query.addFilterQuery(format("{!idFilter count=%d}", count));
 
@@ -114,5 +114,30 @@ class PostFilterPerformanceTest {
 
     System.out.format("count=%d - QTime=%f", count, totalQTime / 10.0F);
   }
+
+  @ParameterizedTest
+  @ValueSource(ints = {50, 500, 1000, 1500, 2000, 2500, 5000})
+  void filterQuery(int count) throws IOException, SolrServerException {
+    SolrQuery query  = new SolrQuery("*:*");
+    StringBuilder filterQuery = new StringBuilder();
+    filterQuery.append("customid:(");
+    for (int id = 0; id < count; id++) {
+      String customid = id % 200000 + "_" +  String.format ("%03d", 1 + id / 200000);
+      filterQuery.append(customid);
+      filterQuery.append(' ');
+    }
+    filterQuery.append(')');
+    query.addFilterQuery(filterQuery.toString());
+
+    int totalQTime = 0;
+    for(int reps = 0; reps < 10; reps++) {
+      QueryResponse response = server.query(query);
+      assertThat(response.getResults().getNumFound()).isEqualTo(count - 1);
+      totalQTime += response.getQTime();
+    }
+
+    System.out.format("count=%d - QTime=%f", count, totalQTime / 10.0F);
+  }
+
 
 }
