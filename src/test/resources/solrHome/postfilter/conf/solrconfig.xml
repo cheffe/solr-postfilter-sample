@@ -38,9 +38,9 @@
     </autoCommit>
   </updateHandler>
 
-  <quer>
+  <query>
     <maxBooleanClauses>10024</maxBooleanClauses>
-  </quer>
+  </query>
 
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
