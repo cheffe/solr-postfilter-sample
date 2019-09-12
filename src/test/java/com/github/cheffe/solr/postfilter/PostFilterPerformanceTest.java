@@ -87,6 +87,10 @@ class PostFilterPerformanceTest {
       server.add(batch);
     }
     server.commit(true, true);
+
+    SolrQuery query  = new SolrQuery("*:*");
+    query.addFilterQuery(format("{!idFilter count=%d}", 1));
+    server.query(query);
   }
 
   @AfterAll
@@ -100,9 +104,15 @@ class PostFilterPerformanceTest {
   void benchmark(int count) throws IOException, SolrServerException {
     SolrQuery query  = new SolrQuery("*:*");
     query.addFilterQuery(format("{!idFilter count=%d}", count));
-    QueryResponse response = server.query(query);
-    System.out.format("count=%d - QTime=%d", count, response.getQTime());
-    assertThat(response.getResults().getNumFound()).isEqualTo(count - 1);
+
+    int totalQTime = 0;
+    for(int reps = 0; reps < 10; reps++) {
+      QueryResponse response = server.query(query);
+      assertThat(response.getResults().getNumFound()).isEqualTo(count - 1);
+      totalQTime += response.getQTime();
+    }
+
+    System.out.format("count=%d - QTime=%f", count, totalQTime / 10.0F);
   }
 
 }

@@ -7,4 +7,4 @@ This table includes the runtime in _ms_ per notable change.
 
 | filter size | 50 | 500 | 1000 | 1500 | 2000 | 2500 | 5000 |
 |---|---|---|---|---|---|---|---|
-| initial | 723 |371 |341 | 335 | 324 | 339 | 356 |
+| initial | 315 | 292 | 294 | 301 | 292 | 299 | 306 |
