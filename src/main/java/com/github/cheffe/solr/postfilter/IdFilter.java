@@ -24,7 +24,7 @@
 package com.github.cheffe.solr.postfilter;
 
 import org.apache.commons.collections.MapUtils;
-import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.IndexSearcher;
@@ -39,7 +39,7 @@ public class IdFilter extends ExtendedQueryBase implements PostFilter {
 
   private HashMap<String, String> customMap;
 
-  public IdFilter(HashMap<String, String> customMap) {
+  IdFilter(HashMap<String, String> customMap) {
     super();
     this.customMap = customMap;
   }
@@ -58,17 +58,16 @@ public class IdFilter extends ExtendedQueryBase implements PostFilter {
   public DelegatingCollector getFilterCollector(IndexSearcher searcher) {
     return new DelegatingCollector() {
 
-      private LeafReader reader;
+      private SortedDocValues sortedDocValues;
 
       @Override
       protected void doSetNextReader(LeafReaderContext context) throws IOException {
         super.doSetNextReader(context);
-        reader = context.reader();
+        sortedDocValues = DocValues.getSorted(context.reader(), "customid");
       }
 
       @Override
       public void collect(int docNumber) throws IOException {
-        SortedDocValues sortedDocValues = reader.getSortedDocValues("customid");
         if (sortedDocValues.advanceExact(docNumber) && isValid(sortedDocValues.binaryValue().utf8ToString())) {
           super.collect(docNumber);
         }
