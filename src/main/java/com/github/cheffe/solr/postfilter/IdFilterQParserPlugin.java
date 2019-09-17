@@ -32,7 +32,7 @@ import org.apache.solr.search.QParser;
 import org.apache.solr.search.QParserPlugin;
 import org.apache.solr.search.SyntaxError;
 
-import java.util.HashMap;
+import java.util.HashSet;
 
 public class IdFilterQParserPlugin extends QParserPlugin {
   public static String NAME = "idFilter";
@@ -48,13 +48,13 @@ public class IdFilterQParserPlugin extends QParserPlugin {
       @Override
       public Query parse() throws SyntaxError {
         int idCount = localParams.getInt("count", 2000);
-        HashMap<BytesRef, String> customMap = new HashMap<>(idCount);
+        HashSet<BytesRef> customSet = new HashSet<>(idCount);
         for (int id = 0; id < idCount; id++) {
           String customid = id % 200000 + "_" +  String.format ("%03d", 1 + id / 200000);
-          customMap.put(new BytesRef(customid), customid);
+          customSet.add(new BytesRef(customid));
         }
 
-        return new IdFilter(customMap);
+        return new IdFilter(customSet);
       }
     };
   }

@@ -23,7 +23,6 @@
  */
 package com.github.cheffe.solr.postfilter;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
@@ -34,15 +33,15 @@ import org.apache.solr.search.ExtendedQueryBase;
 import org.apache.solr.search.PostFilter;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.HashSet;
 
 public class IdFilter extends ExtendedQueryBase implements PostFilter {
 
-  private HashMap<BytesRef, String> customMap;
+  private HashSet<BytesRef> customSet;
 
-  IdFilter(HashMap<BytesRef, String> customMap) {
+  IdFilter(HashSet<BytesRef> customSet) {
     super();
-    this.customMap = customMap;
+    this.customSet = customSet;
   }
 
   @Override
@@ -75,10 +74,7 @@ public class IdFilter extends ExtendedQueryBase implements PostFilter {
       }
 
       private boolean isValid(BytesRef customId) {
-        if (MapUtils.isEmpty(customMap)) {
-          return false;
-        }
-        return customMap.get(customId) != null;
+        return customSet.contains(customId);
       }
 
     };
@@ -91,20 +87,20 @@ public class IdFilter extends ExtendedQueryBase implements PostFilter {
 
     IdFilter that = (IdFilter) o;
 
-    if (this.customMap == null) {
-      return that.customMap == null;
+    if (this.customSet == null) {
+      return that.customSet == null;
     }
-    if (that.customMap == null) {
+    if (that.customSet == null) {
       return false;
     }
 
-    return this.customMap.hashCode() == that.customMap.hashCode();
+    return this.customSet.hashCode() == that.customSet.hashCode();
   }
 
   @Override
   public int hashCode() {
     int result = 1;
-    result = 31 * result + (customMap != null ? customMap.hashCode() : 0);
+    result = 31 * result + (customSet != null ? customSet.hashCode() : 0);
     return result;
   }
 
