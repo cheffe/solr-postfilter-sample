@@ -28,6 +28,7 @@ import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.util.BytesRef;
 import org.apache.solr.search.DelegatingCollector;
 import org.apache.solr.search.ExtendedQueryBase;
 import org.apache.solr.search.PostFilter;
@@ -37,9 +38,9 @@ import java.util.HashMap;
 
 public class IdFilter extends ExtendedQueryBase implements PostFilter {
 
-  private HashMap<String, String> customMap;
+  private HashMap<BytesRef, String> customMap;
 
-  IdFilter(HashMap<String, String> customMap) {
+  IdFilter(HashMap<BytesRef, String> customMap) {
     super();
     this.customMap = customMap;
   }
@@ -68,12 +69,12 @@ public class IdFilter extends ExtendedQueryBase implements PostFilter {
 
       @Override
       public void collect(int docNumber) throws IOException {
-        if (sortedDocValues.advanceExact(docNumber) && isValid(sortedDocValues.binaryValue().utf8ToString())) {
+        if (sortedDocValues.advanceExact(docNumber) && isValid(sortedDocValues.binaryValue())) {
           super.collect(docNumber);
         }
       }
 
-      private boolean isValid(String customId) {
+      private boolean isValid(BytesRef customId) {
         if (MapUtils.isEmpty(customMap)) {
           return false;
         }

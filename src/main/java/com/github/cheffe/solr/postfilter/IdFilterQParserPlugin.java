@@ -24,6 +24,7 @@
 package com.github.cheffe.solr.postfilter;
 
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.request.SolrQueryRequest;
@@ -47,10 +48,10 @@ public class IdFilterQParserPlugin extends QParserPlugin {
       @Override
       public Query parse() throws SyntaxError {
         int idCount = localParams.getInt("count", 2000);
-        HashMap<String, String> customMap = new HashMap<>(idCount);
+        HashMap<BytesRef, String> customMap = new HashMap<>(idCount);
         for (int id = 0; id < idCount; id++) {
           String customid = id % 200000 + "_" +  String.format ("%03d", 1 + id / 200000);
-          customMap.put(customid, customid);
+          customMap.put(new BytesRef(customid), customid);
         }
 
         return new IdFilter(customMap);
