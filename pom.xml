@@ -33,7 +33,7 @@
   <url>https://github.com/cheffe/solr-postfilter-sample</url>
 
   <properties>
-    <version.solr>8.2.0</version.solr>
+    <version.solr>8.8.2</version.solr>
   </properties>
 
   <build>
